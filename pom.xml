@@ -1,0 +1,62 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.github</groupId>
+	<artifactId>daily-util</artifactId>
+	<packaging>jar</packaging>
+	<version>1.0.0</version>
+	<name>${project.groupId}:${project.artifactId}</name>
+	<url>https://github.com/php-sourced/daily-util</url>
+	<description>A java util library which contains some utility functions</description>
+
+	<properties>
+		<jdk.version>1.8</jdk.version>
+		<testng.version>6.9.9</testng.version>
+		<mvn.compiler.version>3.3</mvn.compiler.version>
+		<slf4j.version>1.7.21</slf4j.version>
+	</properties>
+
+	<developers>
+		<developer>
+			<name>Pratapi Hemant</name>
+			<email>hemantsonu20@gmail.com</email>
+			<organizationUrl>https://github.com/hemantsonu20</organizationUrl>
+		</developer>
+	</developers>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>${testng.version}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<!-- Set JDK Compiler Level -->
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${mvn.compiler.version}</version>
+				<configuration>
+					<source>${jdk.version}</source>
+					<target>${jdk.version}</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
