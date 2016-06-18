@@ -11,7 +11,7 @@ import javax.swing.event.MenuListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.gui.base64.Base64Panel;
+import com.github.gui.base64.Base64UrlPanel;
 import com.github.gui.json.JsonViewerPanel;
 import com.github.gui.url.URLPanel;
 
@@ -39,8 +39,7 @@ public class MainGui {
 
         JMenuBar menuBar = new JMenuBar();
         menuBar.add(getJMenu("JSON Viewer", "A JSON Formatter", JsonViewerPanel.getInstance()));
-        menuBar.add(getJMenu("Base64", "A Base64 Encoder/Decoder", Base64Panel.getInstance()));
-        menuBar.add(getJMenu("URL Encoding", "A URL Encoder/Decoder", URLPanel.getInstance()));
+        menuBar.add(getJMenu("Base64/URL", "A Base64/Url Encoder/Decoder", Base64UrlPanel.getInstance()));
         menuBar.add(getJMenu("XML Viewer", "A XML Formatter", JsonViewerPanel.getInstance()));
         menuBar.add(getJMenu("Compare", "A Text Compare Tool", URLPanel.getInstance()));
         mainFrame.setJMenuBar(menuBar);

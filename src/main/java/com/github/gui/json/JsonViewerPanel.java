@@ -19,13 +19,12 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.gui.AbstractPanel;
 import com.github.gui.GuiUtils;
-import com.github.gui.MainGui;
 
 public class JsonViewerPanel extends AbstractPanel {
 
     private static final long serialVersionUID = 7554118114747990205L;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MainGui.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JsonViewerPanel.class);
 
     private static final JsonViewerPanel INSTANCE = new JsonViewerPanel();
 
