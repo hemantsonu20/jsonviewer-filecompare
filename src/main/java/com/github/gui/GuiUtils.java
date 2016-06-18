@@ -1,14 +1,19 @@
 package com.github.gui;
 
-import javax.swing.JMenu;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
 
-import com.github.gui.json.JsonViewerPanel;
 
 
 public class GuiUtils {
     
 
-
+    
+    public static JScrollPane getScrollPane(JTextPane textPane) {
+        
+        JScrollPane scrollPane = new JScrollPane(textPane);
+        TextLineNumber lineNumber = new TextLineNumber(textPane);
+        scrollPane.setRowHeaderView(lineNumber);
+        return scrollPane;
+    }
 }

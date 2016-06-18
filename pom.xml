@@ -14,6 +14,8 @@
 		<testng.version>6.9.9</testng.version>
 		<mvn.compiler.version>3.3</mvn.compiler.version>
 		<slf4j.version>1.7.21</slf4j.version>
+		<fasterxml.version>2.7.5</fasterxml.version>
+		<lang3.version>3.4</lang3.version>
 	</properties>
 
 	<developers>
@@ -35,14 +37,17 @@
 			<artifactId>slf4j-simple</artifactId>
 			<version>${slf4j.version}</version>
 		</dependency>
-
-
 		<dependency>
-			<groupId>org.testng</groupId>
-			<artifactId>testng</artifactId>
-			<version>${testng.version}</version>
-			<scope>test</scope>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${fasterxml.version}</version>
 		</dependency>
+		<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-lang3</artifactId>
+    <version>${lang3.version}</version>
+</dependency>
+		
 	</dependencies>
 
 	<build>

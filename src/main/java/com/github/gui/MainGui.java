@@ -45,7 +45,6 @@ public class MainGui {
         menuBar.add(getJMenu("Compare", "A Text Compare Tool", URLPanel.getInstance()));
         mainFrame.setJMenuBar(menuBar);
         mainFrame.setVisible(true);
-
     }
     
     private JMenu getJMenu(String title, String toolTip, AbstractPanel panel){
