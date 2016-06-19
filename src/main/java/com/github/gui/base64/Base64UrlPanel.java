@@ -9,9 +9,11 @@ import java.util.Base64;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextPane;
 
 import org.apache.commons.lang3.StringUtils;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
+import org.fife.ui.rtextarea.RTextScrollPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,8 +33,8 @@ public class Base64UrlPanel extends AbstractPanel {
         return INSTANCE;
     }
 
-    private JTextPane inputTextPane;
-    private JTextPane outputTextPane;
+    private RSyntaxTextArea inputTextPane;
+    private RSyntaxTextArea outputTextPane;
 
     public Base64UrlPanel() {
 
@@ -84,11 +86,16 @@ public class Base64UrlPanel extends AbstractPanel {
         textAreaPanel.setLayout(new GridLayout(1, 2, 20, 0));
         textAreaPanel.setSize(getMaximumSize());
 
-        inputTextPane = new JTextPane();
-        outputTextPane = new JTextPane();
+        
 
-        textAreaPanel.add(GuiUtils.getScrollPane(inputTextPane));
-        textAreaPanel.add(GuiUtils.getScrollPane(outputTextPane));
+        RTextScrollPane inputScrollPane = GuiUtils.getScrollTextPane(SyntaxConstants.SYNTAX_STYLE_NONE);
+        RTextScrollPane outputScrollPane = GuiUtils.getScrollTextPane(SyntaxConstants.SYNTAX_STYLE_NONE);
+        
+        inputTextPane = (RSyntaxTextArea) inputScrollPane.getTextArea();
+        outputTextPane = (RSyntaxTextArea) outputScrollPane.getTextArea();
+        
+        textAreaPanel.add(inputScrollPane);
+        textAreaPanel.add(outputScrollPane);
 
         add(textAreaPanel, BorderLayout.CENTER);
 

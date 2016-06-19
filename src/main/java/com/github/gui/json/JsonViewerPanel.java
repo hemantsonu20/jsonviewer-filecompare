@@ -1,22 +1,30 @@
 package com.github.gui.json;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextPane;
+import javax.swing.JTextField;
+import javax.swing.UIManager;
 
 import org.apache.commons.lang3.StringUtils;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
+import org.fife.ui.rtextarea.RTextArea;
+import org.fife.ui.rtextarea.RTextScrollPane;
+import org.fife.ui.rtextarea.SearchContext;
+import org.fife.ui.rtextarea.SearchEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.gui.AbstractPanel;
 import com.github.gui.GuiUtils;
 
@@ -33,14 +41,18 @@ public class JsonViewerPanel extends AbstractPanel {
         return INSTANCE;
     }
 
-    private JTextPane textPane;
-
+    private RSyntaxTextArea textPane;
+    private JTextField searchField;
+    private JButton validateButton;
+    
     private File lastDirectory;
 
     public JsonViewerPanel() {
 
         init();
     }
+
+    
 
     private void init() {
 
@@ -49,34 +61,19 @@ public class JsonViewerPanel extends AbstractPanel {
 
         JPanel settingPanel = new JPanel();
 
-        JButton loadFileButton = new JButton("Load File");
-        loadFileButton.setToolTipText("loads contents from file");
-        loadFileButton.addActionListener(e -> {
-
-            loadFile();
-        });
-        settingPanel.add(loadFileButton);
-
-        JButton formatButton = new JButton("Format");
-        formatButton.setToolTipText("formats the input provided");
-        formatButton.addActionListener(e -> {
-
-            toPrettyString();
-        });
-        settingPanel.add(formatButton);
-
-        JButton deformatButton = new JButton("DeFormat");
-        deformatButton.setToolTipText("removes space characters");
-        deformatButton.addActionListener(e -> {
-
-            toSimpleString();
-        });
-        settingPanel.add(deformatButton);
+        settingPanel.add(getLoadFileButton());
+        settingPanel.add(getFormatButton());
+        settingPanel.add(getDeformatButton());
+        settingPanel.add(validateButton = getValidateButton());
+        settingPanel.add(new JLabel("Search"));
+        settingPanel.add(searchField = getSearchField());
 
         add(settingPanel, BorderLayout.NORTH);
 
-        textPane = new JTextPane();
-        add(GuiUtils.getScrollPane(textPane), BorderLayout.CENTER);
+        RTextScrollPane scrollPane = GuiUtils.getScrollTextPane(SyntaxConstants.SYNTAX_STYLE_JSON);
+        textPane = (RSyntaxTextArea) scrollPane.getTextArea();
+
+        add(scrollPane, BorderLayout.CENTER);
     }
 
     private void loadFile() {
@@ -86,71 +83,184 @@ public class JsonViewerPanel extends AbstractPanel {
             lastDirectory = fileChooser.getCurrentDirectory();
             readFile(fileChooser.getSelectedFile());
         }
-
     }
 
-    private void toSimpleString() {
+    private void validateJson() {
 
         String text = textPane.getText();
         if (StringUtils.isBlank(text)) {
             return;
         }
 
-        if (!isValidJson(text)) {
-            return;
+        try {
+            GuiUtils.validateJson(text);
+            validateButton.setForeground(Color.GREEN.darker());
+        } catch (Exception e) {
+            validateButton.setForeground(Color.RED);
+            popup(e);
         }
-        textPane.setText(StringUtils.deleteWhitespace(text));
     }
 
-    private void toPrettyString() {
+    private void toSimpleJson() {
 
         String text = textPane.getText();
         if (StringUtils.isBlank(text)) {
             return;
         }
 
-        if (!isValidJson(text)) {
-            return;
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
         try {
-            String prettyString;
-
-            prettyString = mapper.writer().withDefaultPrettyPrinter().writeValueAsString(mapper.readTree(text));
-
-            textPane.setText(prettyString);
-        } catch (IOException e) {
+            textPane.setText(GuiUtils.toSimpleJson(text));
+        } catch (Exception e) {
             popup(e);
         }
     }
 
-    private boolean isValidJson(String text) {
+    private void toPrettyJson() {
+
+        String text = textPane.getText();
+        if (StringUtils.isBlank(text)) {
+            return;
+        }
 
         try {
-            if (!StringUtils.startsWithAny(text, "[", "{")) {
-                throw new IOException("Invalid JSON, should start it '[' or '}'");
-            }
-
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.readTree(text);
-            return true;
-        } catch (IOException e) {
+            textPane.setText(GuiUtils.toPrettyJson(text));
+        } catch (Exception e) {
             popup(e);
-            return false;
         }
     }
 
     private void readFile(File selectedFile) {
 
         try {
-            StringBuilder builder = new StringBuilder();
-            Files.lines(Paths.get(selectedFile.getAbsolutePath())).forEachOrdered(
-                    s -> builder.append(s).append(System.lineSeparator()));
-            textPane.setText(builder.toString());
+            textPane.setText(GuiUtils.readFile(selectedFile));
         } catch (Exception e) {
             popup(e);
         }
+    }
+
+    private void findInJson() {
+
+        String findText = searchField.getText();
+
+        SearchContext context = new SearchContext(findText);
+        if (!SearchEngine.find(textPane, context).wasFound()) {
+            UIManager.getLookAndFeel().provideErrorFeedback(textPane);
+        }
+        else {
+            //textPane.requestFocusInWindow();
+        }
+        RTextArea.setSelectedOccurrenceText(findText);
+    }
+
+    private JButton getLoadFileButton() {
+
+        JButton loadFileButton = new JButton("Open File");
+        loadFileButton.setToolTipText("loads contents from file");
+        GuiUtils.applyShortcut(loadFileButton, KeyEvent.VK_O, "Open", new AbstractAction() {
+
+            private static final long serialVersionUID = 1235235L;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                loadFile();
+
+            }
+        });
+        loadFileButton.addActionListener(e -> {
+
+            loadFile();
+        });
+        return loadFileButton;
+    }
+
+    private JButton getFormatButton() {
+
+        JButton formatButton = new JButton("Format");
+        formatButton.setToolTipText("formats the input provided");
+        GuiUtils.applyShortcut(formatButton, KeyEvent.VK_Q, "Format", new AbstractAction() {
+
+            private static final long serialVersionUID = 123523535L;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                toPrettyJson();
+
+            }
+        });
+        formatButton.addActionListener(e -> {
+
+            toPrettyJson();
+        });
+        return formatButton;
+
+    }
+
+    private JButton getDeformatButton() {
+
+        JButton deformatButton = new JButton("DeFormat");
+        deformatButton.setToolTipText("compresses json, should be used to send compressed data over networks");
+        GuiUtils.applyShortcut(deformatButton, KeyEvent.VK_W, "Deformat", new AbstractAction() {
+
+            private static final long serialVersionUID = 12352003535L;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                toSimpleJson();
+
+            }
+        });
+        deformatButton.addActionListener(e -> {
+
+            toSimpleJson();
+        });
+        return deformatButton;
+    }
+
+    private JButton getValidateButton() {
+
+        JButton validateButton = new JButton("Validate");
+        validateButton.setToolTipText("validates the json");
+        GuiUtils.applyShortcut(validateButton, KeyEvent.VK_E, "Validate", new AbstractAction() {
+
+            private static final long serialVersionUID = 1235235135L;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                validateJson();
+
+            }
+        });
+        validateButton.addActionListener(e -> {
+
+            validateJson();
+        });
+        return validateButton;
+    }
+
+    private JTextField getSearchField() {
+
+        JTextField searchField = new JTextField(10);
+        searchField.setToolTipText("CTRL+K (fwd) CTRL+SHIFT+K (bkd)");
+        GuiUtils.applyShortcut(searchField, KeyEvent.VK_F, "Find", new AbstractAction() {
+
+            private static final long serialVersionUID = 12352311535L;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                searchField.requestFocusInWindow();
+
+            }
+        });
+        searchField.addActionListener(e -> {
+
+            findInJson();
+        });
+        return searchField;
     }
 
     private void popup(Exception e) {
@@ -158,4 +268,9 @@ public class JsonViewerPanel extends AbstractPanel {
         LOGGER.warn(e.getMessage(), e);
         JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
     }
+
+//    private void popup(String msg) {
+//
+//        JOptionPane.showMessageDialog(this, msg, "Info", JOptionPane.INFORMATION_MESSAGE);
+//    }
 }

@@ -1,10 +1,12 @@
 package com.github.gui;
 
+import java.awt.Container;
 import java.awt.GridLayout;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.SwingUtilities;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
@@ -13,18 +15,26 @@ import org.slf4j.LoggerFactory;
 
 import com.github.gui.base64.Base64UrlPanel;
 import com.github.gui.json.JsonViewerPanel;
-import com.github.gui.url.URLPanel;
 
 public class MainGui {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MainGui.class);
 
     private JFrame mainFrame;
-    
+
     public static void main(String[] args) {
 
         MainGui mainGui = new MainGui();
+
         mainGui.init();
+
+        SwingUtilities.invokeLater(() -> mainGui.setVisible());
+
+    }
+
+    private void setVisible() {
+
+        mainFrame.setVisible(true);
     }
 
     private void init() {
@@ -38,45 +48,57 @@ public class MainGui {
         mainFrame.setLayout(new GridLayout(1, 1));
 
         JMenuBar menuBar = new JMenuBar();
-        menuBar.add(getJMenu("JSON Viewer", "A JSON Formatter", JsonViewerPanel.getInstance()));
-        menuBar.add(getJMenu("Base64/URL", "A Base64/Url Encoder/Decoder", Base64UrlPanel.getInstance()));
-        menuBar.add(getJMenu("XML Viewer", "A XML Formatter", JsonViewerPanel.getInstance()));
-        menuBar.add(getJMenu("Compare", "A Text Compare Tool", URLPanel.getInstance()));
+        menuBar.add(getJMenu("JSON Viewer", 'J', "A JSON Formatter", JsonViewerPanel.getInstance()));
+        menuBar.add(getJMenu("Base64/URL", 'B', "A Base64/Url Encoder/Decoder", Base64UrlPanel.getInstance()));
+        menuBar.add(getJMenu("Compare", 'C', "A Text Compare Tool", Base64UrlPanel.getInstance()));
         mainFrame.setJMenuBar(menuBar);
         mainFrame.setVisible(true);
     }
-    
-    private JMenu getJMenu(String title, String toolTip, AbstractPanel panel){
-        JMenu jsonViewerMenu = new JMenu(title);
-        jsonViewerMenu.setToolTipText(toolTip);
-        jsonViewerMenu.addMenuListener(new MenuListener() {
-            
+
+    private JMenu getJMenu(String title, char mnemonic, String toolTip, AbstractPanel panel) {
+
+        JMenu jMenu = new JMenu(title);
+        jMenu.setMnemonic(mnemonic);
+        jMenu.setToolTipText(toolTip);
+        jMenu.addMenuListener(new MenuListener() {
+
             @Override
             public void menuSelected(MenuEvent e) {
-            
-                resetMainGui();
-                mainFrame.getContentPane().add(panel);
-                refreshMainGui();
+
+                Container contentPane = mainFrame.getContentPane();
+
+                if (contentPane.getComponents().length <= 0 || contentPane.getComponent(0) != panel) {
+                    resetMainGui();
+                    mainFrame.getContentPane().add(panel);
+                    refreshMainGui();
+                }
             }
-            
+
             @Override
             public void menuDeselected(MenuEvent e) {
+
             }
-            
+
             @Override
             public void menuCanceled(MenuEvent e) {
+
                 System.out.println("menuCanceled");
             }
         });
-        return jsonViewerMenu;
+        return jMenu;
     }
-    
+
     private void resetMainGui() {
+
         mainFrame.getContentPane().removeAll();
     }
-    
+
     private void refreshMainGui() {
+
         mainFrame.revalidate();
         mainFrame.repaint();
     }
 }
+
+// close popup when clicked outside
+// labels instead popup for json exception

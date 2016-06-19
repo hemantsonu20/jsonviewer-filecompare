@@ -14,8 +14,10 @@
 		<testng.version>6.9.9</testng.version>
 		<mvn.compiler.version>3.3</mvn.compiler.version>
 		<slf4j.version>1.7.21</slf4j.version>
+		<gson.version>2.7</gson.version>
 		<fasterxml.version>2.7.5</fasterxml.version>
 		<lang3.version>3.4</lang3.version>
+		<rsyntax.version>2.5.8</rsyntax.version>
 	</properties>
 
 	<developers>
@@ -43,11 +45,20 @@
 			<version>${fasterxml.version}</version>
 		</dependency>
 		<dependency>
-    <groupId>org.apache.commons</groupId>
-    <artifactId>commons-lang3</artifactId>
-    <version>${lang3.version}</version>
-</dependency>
-		
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>${gson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>${lang3.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fifesoft</groupId>
+			<artifactId>rsyntaxtextarea</artifactId>
+			<version>${rsyntax.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
