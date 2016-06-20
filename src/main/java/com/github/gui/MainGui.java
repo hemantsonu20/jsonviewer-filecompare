@@ -100,5 +100,4 @@ public class MainGui {
     }
 }
 
-// close popup when clicked outside
-// labels instead popup for json exception
+// auto hide panel

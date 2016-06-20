@@ -10,7 +10,6 @@ import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
@@ -25,8 +24,11 @@ import org.fife.ui.rtextarea.SearchEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonLocation;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.gui.AbstractPanel;
 import com.github.gui.GuiUtils;
+import com.google.gson.JsonSyntaxException;
 
 public class JsonViewerPanel extends AbstractPanel {
 
@@ -44,7 +46,10 @@ public class JsonViewerPanel extends AbstractPanel {
     private RSyntaxTextArea textPane;
     private JTextField searchField;
     private JButton validateButton;
-    
+
+    private JLabel msgLabel = new JLabel();
+    private JPanel msgPanel = new JPanel();
+
     private File lastDirectory;
 
     public JsonViewerPanel() {
@@ -52,28 +57,32 @@ public class JsonViewerPanel extends AbstractPanel {
         init();
     }
 
-    
-
     private void init() {
 
         setSize(getMaximumSize());
         setLayout(new BorderLayout());
 
         JPanel settingPanel = new JPanel();
-
         settingPanel.add(getLoadFileButton());
         settingPanel.add(getFormatButton());
         settingPanel.add(getDeformatButton());
         settingPanel.add(validateButton = getValidateButton());
         settingPanel.add(new JLabel("Search"));
         settingPanel.add(searchField = getSearchField());
+        settingPanel.add(msgLabel);
 
-        add(settingPanel, BorderLayout.NORTH);
+        msgPanel.add(msgLabel);
+
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.add(settingPanel, BorderLayout.NORTH);
+        topPanel.add(msgPanel, BorderLayout.CENTER);
+        add(topPanel, BorderLayout.NORTH);
 
         RTextScrollPane scrollPane = GuiUtils.getScrollTextPane(SyntaxConstants.SYNTAX_STYLE_JSON);
         textPane = (RSyntaxTextArea) scrollPane.getTextArea();
 
         add(scrollPane, BorderLayout.CENTER);
+
     }
 
     private void loadFile() {
@@ -147,7 +156,7 @@ public class JsonViewerPanel extends AbstractPanel {
             UIManager.getLookAndFeel().provideErrorFeedback(textPane);
         }
         else {
-            //textPane.requestFocusInWindow();
+            // textPane.requestFocusInWindow();
         }
         RTextArea.setSelectedOccurrenceText(findText);
     }
@@ -265,12 +274,39 @@ public class JsonViewerPanel extends AbstractPanel {
 
     private void popup(Exception e) {
 
-        LOGGER.warn(e.getMessage(), e);
-        JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        LOGGER.warn("Exception occurred", e);
+        // JOptionPane.showMessageDialog(this, e.getMessage(), "Error",
+        // JOptionPane.ERROR_MESSAGE);
+
+        StringBuilder filteredMsg = new StringBuilder();
+        if (e instanceof JsonProcessingException) {
+            JsonProcessingException jpe = (JsonProcessingException) e;
+            filteredMsg.append(jpe.getOriginalMessage());
+            JsonLocation location = jpe.getLocation();
+            String locationStr = String.format(" at line %d col %d", location.getLineNr(), location.getColumnNr());
+            filteredMsg.append(locationStr);
+            // textPane.setCaretPosition(textPane.getDocument().getDefaultRootElement()
+            // .getElement(location.getLineNr() - 1).getStartOffset());
+            // textPane.requestFocusInWindow();
+        }
+        else if (e instanceof JsonSyntaxException) {
+
+            String msg = StringUtils.substringAfter(e.getMessage(), "Exception: ");
+            filteredMsg.append(msg);
+        }
+
+        else {
+            filteredMsg.append(e.getMessage());
+        }
+
+        msgLabel.setText(filteredMsg.toString());
+        msgLabel.setForeground(Color.RED);
+        msgPanel.setVisible(true);
     }
 
-//    private void popup(String msg) {
-//
-//        JOptionPane.showMessageDialog(this, msg, "Info", JOptionPane.INFORMATION_MESSAGE);
-//    }
+    // private void popup(String msg) {
+    //
+    // JOptionPane.showMessageDialog(this, msg, "Info",
+    // JOptionPane.INFORMATION_MESSAGE);
+    // }
 }

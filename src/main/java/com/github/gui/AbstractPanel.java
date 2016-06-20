@@ -11,7 +11,7 @@ public class AbstractPanel extends JPanel {
     public AbstractPanel() {
         
         setSize(getMaximumSize());
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        setBorder(BorderFactory.createEmptyBorder(5, 20, 20, 20));
         
     }
     
