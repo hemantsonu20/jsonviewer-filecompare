@@ -1,4 +1,4 @@
-package com.github.gui;
+package com.github.jsonview.core.gui;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;

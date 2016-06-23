@@ -1,4 +1,4 @@
-package com.github.gui;
+package com.github.jsonview.gui;
 
 import java.awt.Container;
 import java.awt.GridLayout;
@@ -13,14 +13,17 @@ import javax.swing.event.MenuListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.gui.base64.Base64UrlPanel;
-import com.github.gui.json.JsonViewerPanel;
+import com.github.jsonview.base64.gui.Base64UrlPanel;
+import com.github.jsonview.compare.gui.ComparePanel;
+import com.github.jsonview.core.gui.AbstractPanel;
+import com.github.jsonview.json.gui.JsonViewerPanel;
 
 public class MainGui {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MainGui.class);
 
     private JFrame mainFrame;
+    private JMenu jsonMenu;
 
     public static void main(String[] args) {
 
@@ -35,6 +38,7 @@ public class MainGui {
     private void setVisible() {
 
         mainFrame.setVisible(true);
+        jsonMenu.doClick();
     }
 
     private void init() {
@@ -48,11 +52,10 @@ public class MainGui {
         mainFrame.setLayout(new GridLayout(1, 1));
 
         JMenuBar menuBar = new JMenuBar();
-        menuBar.add(getJMenu("JSON Viewer", 'J', "A JSON Formatter", JsonViewerPanel.getInstance()));
+        menuBar.add(jsonMenu = getJMenu("JSON Viewer", 'J', "A JSON Formatter", JsonViewerPanel.getInstance()));
         menuBar.add(getJMenu("Base64/URL", 'B', "A Base64/Url Encoder/Decoder", Base64UrlPanel.getInstance()));
-        menuBar.add(getJMenu("Compare", 'C', "A Text Compare Tool", Base64UrlPanel.getInstance()));
+        menuBar.add(getJMenu("Compare", 'C', "A Text Compare Tool", ComparePanel.getInstance()));
         mainFrame.setJMenuBar(menuBar);
-        mainFrame.setVisible(true);
     }
 
     private JMenu getJMenu(String title, char mnemonic, String toolTip, AbstractPanel panel) {
@@ -99,5 +102,3 @@ public class MainGui {
         mainFrame.repaint();
     }
 }
-
-// auto hide panel

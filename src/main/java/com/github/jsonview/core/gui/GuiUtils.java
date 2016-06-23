@@ -1,4 +1,4 @@
-package com.github.gui;
+package com.github.jsonview.core.gui;
 
 import java.awt.event.KeyEvent;
 import java.io.File;

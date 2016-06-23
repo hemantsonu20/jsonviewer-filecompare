@@ -1,4 +1,4 @@
-package com.github.gui.json;
+package com.github.jsonview.json.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -7,12 +7,17 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 
 import javax.swing.AbstractAction;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.Timer;
 import javax.swing.UIManager;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import org.apache.commons.lang3.StringUtils;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
@@ -26,8 +31,8 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.gui.AbstractPanel;
-import com.github.gui.GuiUtils;
+import com.github.jsonview.core.gui.AbstractPanel;
+import com.github.jsonview.core.gui.GuiUtils;
 import com.google.gson.JsonSyntaxException;
 
 public class JsonViewerPanel extends AbstractPanel {
@@ -43,9 +48,17 @@ public class JsonViewerPanel extends AbstractPanel {
         return INSTANCE;
     }
 
+    private static final int DEFAULT_DELAY_MS = 1250;
+
+    
+    private JLabel jsonIndicator = new JLabel();
+    private Icon validJsonIcon;
+    private Icon invalidJsonIcon;
+    
     private RSyntaxTextArea textPane;
     private JTextField searchField;
-    private JButton validateButton;
+
+    private Timer timer;
 
     private JLabel msgLabel = new JLabel();
     private JPanel msgPanel = new JPanel();
@@ -55,6 +68,7 @@ public class JsonViewerPanel extends AbstractPanel {
     public JsonViewerPanel() {
 
         init();
+        
     }
 
     private void init() {
@@ -63,10 +77,10 @@ public class JsonViewerPanel extends AbstractPanel {
         setLayout(new BorderLayout());
 
         JPanel settingPanel = new JPanel();
+        settingPanel.add(jsonIndicator);
         settingPanel.add(getLoadFileButton());
         settingPanel.add(getFormatButton());
         settingPanel.add(getDeformatButton());
-        settingPanel.add(validateButton = getValidateButton());
         settingPanel.add(new JLabel("Search"));
         settingPanel.add(searchField = getSearchField());
         settingPanel.add(msgLabel);
@@ -80,9 +94,32 @@ public class JsonViewerPanel extends AbstractPanel {
 
         RTextScrollPane scrollPane = GuiUtils.getScrollTextPane(SyntaxConstants.SYNTAX_STYLE_JSON);
         textPane = (RSyntaxTextArea) scrollPane.getTextArea();
+        textPane.getDocument().addDocumentListener(new DocumentListener() {
 
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+
+                handleDocumentChange();
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+
+                handleDocumentChange();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+
+            }
+        });
         add(scrollPane, BorderLayout.CENTER);
-
+        
+        timer = new Timer(DEFAULT_DELAY_MS, (e) -> validateJson());
+        timer.setRepeats(false);
+        
+        validJsonIcon = new ImageIcon(getClass().getResource("/tick.png"));
+        invalidJsonIcon = new ImageIcon(getClass().getResource("/error.png"));
     }
 
     private void loadFile() {
@@ -98,14 +135,17 @@ public class JsonViewerPanel extends AbstractPanel {
 
         String text = textPane.getText();
         if (StringUtils.isBlank(text)) {
+            jsonIndicator.setIcon(null);
+            msgPanel.setVisible(false);
             return;
         }
 
         try {
             GuiUtils.validateJson(text);
-            validateButton.setForeground(Color.GREEN.darker());
+            msgPanel.setVisible(false);
+            jsonIndicator.setIcon(validJsonIcon);
         } catch (Exception e) {
-            validateButton.setForeground(Color.RED);
+            jsonIndicator.setIcon(invalidJsonIcon);
             popup(e);
         }
     }
@@ -119,6 +159,7 @@ public class JsonViewerPanel extends AbstractPanel {
 
         try {
             textPane.setText(GuiUtils.toSimpleJson(text));
+            msgPanel.setVisible(false);
         } catch (Exception e) {
             popup(e);
         }
@@ -133,6 +174,7 @@ public class JsonViewerPanel extends AbstractPanel {
 
         try {
             textPane.setText(GuiUtils.toPrettyJson(text));
+            msgPanel.setVisible(false);
         } catch (Exception e) {
             popup(e);
         }
@@ -228,28 +270,6 @@ public class JsonViewerPanel extends AbstractPanel {
         return deformatButton;
     }
 
-    private JButton getValidateButton() {
-
-        JButton validateButton = new JButton("Validate");
-        validateButton.setToolTipText("validates the json");
-        GuiUtils.applyShortcut(validateButton, KeyEvent.VK_E, "Validate", new AbstractAction() {
-
-            private static final long serialVersionUID = 1235235135L;
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                validateJson();
-
-            }
-        });
-        validateButton.addActionListener(e -> {
-
-            validateJson();
-        });
-        return validateButton;
-    }
-
     private JTextField getSearchField() {
 
         JTextField searchField = new JTextField(10);
@@ -304,9 +324,7 @@ public class JsonViewerPanel extends AbstractPanel {
         msgPanel.setVisible(true);
     }
 
-    // private void popup(String msg) {
-    //
-    // JOptionPane.showMessageDialog(this, msg, "Info",
-    // JOptionPane.INFORMATION_MESSAGE);
-    // }
+    private void handleDocumentChange() {
+        timer.restart();
+    }
 }
