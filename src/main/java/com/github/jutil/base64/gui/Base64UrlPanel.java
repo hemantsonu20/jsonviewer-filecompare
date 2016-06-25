@@ -1,4 +1,4 @@
-package com.github.jsonview.base64.gui;
+package com.github.jutil.base64.gui;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
@@ -17,8 +17,8 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.jsonview.core.gui.AbstractPanel;
-import com.github.jsonview.core.gui.GuiUtils;
+import com.github.jutil.core.gui.AbstractPanel;
+import com.github.jutil.core.gui.GuiUtils;
 
 public class Base64UrlPanel extends AbstractPanel {
 

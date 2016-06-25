@@ -1,4 +1,4 @@
-package com.github.jsonview.gui;
+package com.github.jutil.gui;
 
 import java.awt.Container;
 import java.awt.GridLayout;
@@ -13,10 +13,10 @@ import javax.swing.event.MenuListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.jsonview.base64.gui.Base64UrlPanel;
-import com.github.jsonview.compare.gui.ComparePanel;
-import com.github.jsonview.core.gui.AbstractPanel;
-import com.github.jsonview.json.gui.JsonViewerPanel;
+import com.github.jutil.base64.gui.Base64UrlPanel;
+import com.github.jutil.compare.gui.ComparePanel;
+import com.github.jutil.core.gui.AbstractPanel;
+import com.github.jutil.json.gui.JsonViewerPanel;
 
 public class MainGui {
 
@@ -102,3 +102,4 @@ public class MainGui {
         mainFrame.repaint();
     }
 }
+// ctrl + L for line number

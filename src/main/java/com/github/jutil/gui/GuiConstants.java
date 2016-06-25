@@ -1,4 +1,4 @@
-package com.github.jsonview.gui;
+package com.github.jutil.gui;
 
 
 public class GuiConstants {

@@ -1,11 +1,11 @@
-package com.github.jsonview.compare.gui;
+package com.github.jutil.compare.gui;
 
 import java.awt.GridLayout;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.jsonview.core.gui.AbstractPanel;
+import com.github.jutil.core.gui.AbstractPanel;
 
 public class ComparePanel extends AbstractPanel {
 

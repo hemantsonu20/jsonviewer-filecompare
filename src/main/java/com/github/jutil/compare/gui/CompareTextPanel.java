@@ -1,4 +1,4 @@
-package com.github.jsonview.compare.gui;
+package com.github.jutil.compare.gui;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -17,7 +17,7 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.jsonview.core.gui.GuiUtils;
+import com.github.jutil.core.gui.GuiUtils;
 
 public class CompareTextPanel extends JPanel {
 

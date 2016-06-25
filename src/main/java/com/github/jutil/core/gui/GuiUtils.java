@@ -1,4 +1,4 @@
-package com.github.jsonview.core.gui;
+package com.github.jutil.core.gui;
 
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -31,22 +31,17 @@ public class GuiUtils {
 
     private static RSyntaxTextArea getTextPane(String contentType) {
 
-        RSyntaxTextArea textPane = new RSyntaxTextArea();
+        ExtendedTextPane textPane = new ExtendedTextPane();
         textPane.setSyntaxEditingStyle(contentType);
-        textPane.setCodeFoldingEnabled(true);
-        textPane.setHighlightCurrentLine(true);
-        // textPane.setAutoIndentEnabled(true);
-        // textPane.setHyperlinksEnabled(true);
-        textPane.setBracketMatchingEnabled(true);
+        textPane.setAutoscrolls(true);
         return textPane;
     }
 
-    public static void applyShortcut(JComponent component, int keyCode, String actionKey, AbstractAction abstractAction)
- {
+    public static void applyShortcut(JComponent component, int keyCode, String actionKey, AbstractAction abstractAction) {
 
         InputMap im = component.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(KeyStroke.getKeyStroke(keyCode, KeyEvent.CTRL_DOWN_MASK), actionKey);
-        
+
         ActionMap am = component.getActionMap();
         am.put(actionKey, abstractAction);
     }
@@ -62,7 +57,8 @@ public class GuiUtils {
     public static String toPrettyJson(String text) throws IOException {
 
         GsonBuilder builder = new GsonBuilder();
-        builder.setPrettyPrinting().disableHtmlEscaping().serializeNulls();
+        
+        builder.setPrettyPrinting().disableHtmlEscaping().serializeNulls().setLenient();
         Gson gson = builder.create();
         Object jsonObj = gson.fromJson(text, Object.class);
         return gson.toJson(jsonObj);

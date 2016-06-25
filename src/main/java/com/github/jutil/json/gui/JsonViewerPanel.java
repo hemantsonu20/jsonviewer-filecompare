@@ -1,4 +1,4 @@
-package com.github.jsonview.json.gui;
+package com.github.jutil.json.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -12,6 +12,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.Timer;
@@ -20,7 +21,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.apache.commons.lang3.StringUtils;
-import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextArea;
 import org.fife.ui.rtextarea.RTextScrollPane;
@@ -31,8 +31,9 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.jsonview.core.gui.AbstractPanel;
-import com.github.jsonview.core.gui.GuiUtils;
+import com.github.jutil.core.gui.AbstractPanel;
+import com.github.jutil.core.gui.ExtendedTextPane;
+import com.github.jutil.core.gui.GuiUtils;
 import com.google.gson.JsonSyntaxException;
 
 public class JsonViewerPanel extends AbstractPanel {
@@ -50,12 +51,11 @@ public class JsonViewerPanel extends AbstractPanel {
 
     private static final int DEFAULT_DELAY_MS = 1250;
 
-    
     private JLabel jsonIndicator = new JLabel();
     private Icon validJsonIcon;
     private Icon invalidJsonIcon;
-    
-    private RSyntaxTextArea textPane;
+
+    private ExtendedTextPane textPane;
     private JTextField searchField;
 
     private Timer timer;
@@ -68,7 +68,7 @@ public class JsonViewerPanel extends AbstractPanel {
     public JsonViewerPanel() {
 
         init();
-        
+
     }
 
     private void init() {
@@ -93,7 +93,35 @@ public class JsonViewerPanel extends AbstractPanel {
         add(topPanel, BorderLayout.NORTH);
 
         RTextScrollPane scrollPane = GuiUtils.getScrollTextPane(SyntaxConstants.SYNTAX_STYLE_JSON);
-        textPane = (RSyntaxTextArea) scrollPane.getTextArea();
+        textPane = (ExtendedTextPane) scrollPane.getTextArea();
+
+        textPane.setCodeFoldingEnabled(true);
+        textPane.setHighlightCurrentLine(true);
+        // textPane.setAutoIndentEnabled(true);
+        // textPane.setHyperlinksEnabled(true);
+        textPane.setBracketMatchingEnabled(true);
+
+        GuiUtils.applyShortcut(textPane, KeyEvent.VK_L, "lineNumber", new AbstractAction() {
+
+            private static final long serialVersionUID = -506406567119696504L;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                try {
+
+                    textPane.setCaretLineNumber(Integer.parseInt((String) JOptionPane.showInputDialog(
+                            JsonViewerPanel.this, String.format("Enter Line Number (1, %d)", textPane.getLineCount()),
+                            "Go to Line", JOptionPane.PLAIN_MESSAGE, null, null,
+                            Integer.toString(textPane.getCaretLineNumber() + 1))));
+                } catch (NumberFormatException ex) {
+                    // ignore
+                } catch (Exception ex) {
+                    LOGGER.warn("excption while taking line number as input", ex);
+                }
+            }
+        });
+
         textPane.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override
@@ -114,10 +142,10 @@ public class JsonViewerPanel extends AbstractPanel {
             }
         });
         add(scrollPane, BorderLayout.CENTER);
-        
+
         timer = new Timer(DEFAULT_DELAY_MS, (e) -> validateJson());
         timer.setRepeats(false);
-        
+
         validJsonIcon = new ImageIcon(getClass().getResource("/tick.png"));
         invalidJsonIcon = new ImageIcon(getClass().getResource("/error.png"));
     }
@@ -237,11 +265,9 @@ public class JsonViewerPanel extends AbstractPanel {
             public void actionPerformed(ActionEvent e) {
 
                 toPrettyJson();
-
             }
         });
         formatButton.addActionListener(e -> {
-
             toPrettyJson();
         });
         return formatButton;
@@ -325,6 +351,7 @@ public class JsonViewerPanel extends AbstractPanel {
     }
 
     private void handleDocumentChange() {
+
         timer.restart();
     }
 }
