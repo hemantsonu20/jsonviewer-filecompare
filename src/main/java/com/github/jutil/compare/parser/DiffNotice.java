@@ -14,19 +14,19 @@ public class DiffNotice {
     // to denote color at right side when code was removed at left side
     private static final Color GREY_COLOR = new Color(242, 242, 242);
 
-    private DiffType level;
+    private DiffType diffType;
     private int line;
     private int startOffset;
     private int length;
 
-    public DiffType getLevel() {
+    public DiffType getDiffType() {
 
-        return level;
+        return diffType;
     }
 
-    public DiffNotice setLevel(DiffType level) {
+    public DiffNotice setDiffType(DiffType diffType) {
 
-        this.level = level;
+        this.diffType = diffType;
         return this;
     }
 

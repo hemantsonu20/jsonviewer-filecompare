@@ -104,6 +104,7 @@ public class JsonViewerPanel extends AbstractPanel {
         // textPane.setAutoIndentEnabled(true);
         // textPane.setHyperlinksEnabled(true);
         textPane.setBracketMatchingEnabled(true);
+        textPane.setPaintMatchedBracketPair(true);
 
         GuiUtils.applyShortcut(textPane, KeyEvent.VK_L, "lineNumber", new AbstractAction() {
 

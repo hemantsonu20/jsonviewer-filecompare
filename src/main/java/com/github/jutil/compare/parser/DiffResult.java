@@ -1,72 +1,19 @@
 package com.github.jutil.compare.parser;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import difflib.DiffRow;
 
 public class DiffResult {
 
-    private int firstLineParsed;
-    private int lastLineParsed;
-    private List<DiffNotice> leftNotices;
-    private List<DiffNotice> rightNotices;
+    private List<DiffRow> diffRows;
     private long parseTime;
     private Exception error;
 
     public DiffResult() {
 
-        leftNotices = new ArrayList<DiffNotice>();
-        rightNotices = new ArrayList<DiffNotice>();
-    }
-
-    public int getFirstLineParsed() {
-
-        return firstLineParsed;
-    }
-
-    public int getLastLineParsed() {
-
-        return lastLineParsed;
-    }
-
-    public List<DiffNotice> getLeftNotices() {
-
-        return leftNotices;
-    }
-
-    public List<DiffNotice> getRightNotices() {
-
-        return leftNotices;
-    }
-
-    public DiffResult addNotice(DiffNotice leftNotice, DiffNotice rightNotice) {
-
-        this.leftNotices.add(leftNotice);
-        this.rightNotices.add(rightNotice);
-        return this;
-    }
-
-    public DiffResult addLeftNotice(DiffNotice leftNotice) {
-
-        this.leftNotices.add(leftNotice);
-        return this;
-    }
-
-    public DiffResult addRightNotice(DiffNotice rightNotice) {
-
-        this.rightNotices.add(rightNotice);
-        return this;
-    }
-
-    public void clearNotices() {
-
-        leftNotices.clear();
-        rightNotices.clear();
-    }
-
-    public void setParsedLines(int first, int last) {
-
-        firstLineParsed = first;
-        lastLineParsed = last;
+        clear();
     }
 
     public long getParseTime() {
@@ -85,9 +32,36 @@ public class DiffResult {
         return error;
     }
 
+    public boolean hasError() {
+
+        return error != null;
+    }
+
     public DiffResult setError(Exception error) {
 
         this.error = error;
         return this;
+    }
+
+    public List<DiffRow> getDiffRows() {
+
+        return diffRows;
+    }
+
+    public DiffResult setDiffRows(List<DiffRow> diffRows) {
+
+        this.diffRows = diffRows;
+        return this;
+    }
+
+    /**
+     * reinitializes fields to reuse the object
+     * 
+     */
+    public void clear() {
+
+        diffRows = Collections.emptyList();
+        parseTime = 0;
+        error = null;
     }
 }
