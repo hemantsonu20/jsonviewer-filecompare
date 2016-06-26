@@ -2,16 +2,14 @@ package com.github.jutil.compare.gui;
 
 import java.awt.GridLayout;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.github.jutil.compare.parser.ParserManager;
 import com.github.jutil.core.gui.AbstractPanel;
 
 public class ComparePanel extends AbstractPanel {
 
     private static final long serialVersionUID = 114747990205L;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ComparePanel.class);
+    // private static final Logger LOGGER = LoggerFactory.getLogger(ComparePanel.class);
 
     private static final ComparePanel INSTANCE = new ComparePanel();
 
@@ -22,12 +20,13 @@ public class ComparePanel extends AbstractPanel {
 
     private CompareTextPanel leftPanel;
     private CompareTextPanel rightPanel;
-
-   
+    
+    private ParserManager  parserManager;
 
     public ComparePanel() {
 
         init();
+        parserManager = new ParserManager(leftPanel.getTextPane(), rightPanel.getTextPane());
     }
 
     private void init() {
@@ -38,7 +37,6 @@ public class ComparePanel extends AbstractPanel {
         add(leftPanel = new CompareTextPanel());
         add(rightPanel = new CompareTextPanel());
         
-        //leftPanel.getTextPane().loadMacro(macro);append(str);
 
     }
 

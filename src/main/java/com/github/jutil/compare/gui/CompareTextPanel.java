@@ -1,6 +1,7 @@
 package com.github.jutil.compare.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -11,12 +12,12 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.jutil.core.gui.ExtendedTextPane;
 import com.github.jutil.core.gui.GuiUtils;
 
 public class CompareTextPanel extends JPanel {
@@ -26,14 +27,14 @@ public class CompareTextPanel extends JPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(ComparePanel.class);
 
     private File lastDirectory;
-    private RSyntaxTextArea textPane;
+    private ExtendedTextPane textPane;
 
-    public RSyntaxTextArea getTextPane() {
+    public ExtendedTextPane getTextPane() {
 
         return textPane;
     }
 
-    public void setTextPane(RSyntaxTextArea textPane) {
+    public void setTextPane(ExtendedTextPane textPane) {
 
         this.textPane = textPane;
     }
@@ -41,8 +42,15 @@ public class CompareTextPanel extends JPanel {
     public CompareTextPanel() {
 
         init();
+        
+        
     }
 
+    public Color getBackgroundColor() {
+        
+        return textPane.getBackground();
+    }
+    
     private void init() {
 
         setLayout(new BorderLayout());
@@ -51,7 +59,7 @@ public class CompareTextPanel extends JPanel {
         settingPanel.add(getLoadFileButton());
 
         RTextScrollPane scrollPane = GuiUtils.getScrollTextPane(SyntaxConstants.SYNTAX_STYLE_NONE);
-        setTextPane((RSyntaxTextArea) scrollPane.getTextArea());
+        setTextPane((ExtendedTextPane) scrollPane.getTextArea());
 
         add(settingPanel, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);

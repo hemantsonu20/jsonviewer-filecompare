@@ -34,6 +34,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.jutil.core.gui.AbstractPanel;
 import com.github.jutil.core.gui.ExtendedTextPane;
 import com.github.jutil.core.gui.GuiUtils;
+import com.github.jutil.gui.GuiConstants;
 import com.google.gson.JsonSyntaxException;
 
 public class JsonViewerPanel extends AbstractPanel {
@@ -49,7 +50,7 @@ public class JsonViewerPanel extends AbstractPanel {
         return INSTANCE;
     }
 
-    private static final int DEFAULT_DELAY_MS = 1250;
+    
 
     private JLabel jsonIndicator = new JLabel();
     private Icon validJsonIcon;
@@ -68,6 +69,9 @@ public class JsonViewerPanel extends AbstractPanel {
     public JsonViewerPanel() {
 
         init();
+        
+        timer = new Timer(GuiConstants.DEFAULT_DELAY_MS, (e) -> validateJson());
+        timer.setRepeats(false);
 
     }
 
@@ -127,13 +131,13 @@ public class JsonViewerPanel extends AbstractPanel {
             @Override
             public void removeUpdate(DocumentEvent e) {
 
-                handleDocumentChange();
+                timer.restart();
             }
 
             @Override
             public void insertUpdate(DocumentEvent e) {
 
-                handleDocumentChange();
+                timer.restart();
             }
 
             @Override
@@ -143,11 +147,9 @@ public class JsonViewerPanel extends AbstractPanel {
         });
         add(scrollPane, BorderLayout.CENTER);
 
-        timer = new Timer(DEFAULT_DELAY_MS, (e) -> validateJson());
-        timer.setRepeats(false);
-
         validJsonIcon = new ImageIcon(getClass().getResource("/tick.png"));
         invalidJsonIcon = new ImageIcon(getClass().getResource("/error.png"));
+        
     }
 
     private void loadFile() {
@@ -348,10 +350,5 @@ public class JsonViewerPanel extends AbstractPanel {
         msgLabel.setText(filteredMsg.toString());
         msgLabel.setForeground(Color.RED);
         msgPanel.setVisible(true);
-    }
-
-    private void handleDocumentChange() {
-
-        timer.restart();
     }
 }
