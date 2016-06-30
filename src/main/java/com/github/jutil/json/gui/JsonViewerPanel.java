@@ -50,8 +50,6 @@ public class JsonViewerPanel extends AbstractPanel {
         return INSTANCE;
     }
 
-    
-
     private JLabel jsonIndicator = new JLabel();
     private Icon validJsonIcon;
     private Icon invalidJsonIcon;
@@ -69,7 +67,7 @@ public class JsonViewerPanel extends AbstractPanel {
     public JsonViewerPanel() {
 
         init();
-        
+
         timer = new Timer(GuiConstants.DEFAULT_DELAY_MS, (e) -> validateJson());
         timer.setRepeats(false);
 
@@ -120,8 +118,9 @@ public class JsonViewerPanel extends AbstractPanel {
                             "Go to Line", JOptionPane.PLAIN_MESSAGE, null, null,
                             Integer.toString(textPane.getCaretLineNumber() + 1))));
                 } catch (NumberFormatException ex) {
-                    // ignore
+                    UIManager.getLookAndFeel().provideErrorFeedback(JsonViewerPanel.this);
                 } catch (Exception ex) {
+                    UIManager.getLookAndFeel().provideErrorFeedback(JsonViewerPanel.this);
                     LOGGER.warn("excption while taking line number as input", ex);
                 }
             }
@@ -150,7 +149,7 @@ public class JsonViewerPanel extends AbstractPanel {
 
         validJsonIcon = new ImageIcon(getClass().getResource("/tick.png"));
         invalidJsonIcon = new ImageIcon(getClass().getResource("/error.png"));
-        
+
     }
 
     private void loadFile() {
@@ -226,10 +225,7 @@ public class JsonViewerPanel extends AbstractPanel {
 
         SearchContext context = new SearchContext(findText);
         if (!SearchEngine.find(textPane, context).wasFound()) {
-            UIManager.getLookAndFeel().provideErrorFeedback(textPane);
-        }
-        else {
-            // textPane.requestFocusInWindow();
+            UIManager.getLookAndFeel().provideErrorFeedback(JsonViewerPanel.this);
         }
         RTextArea.setSelectedOccurrenceText(findText);
     }
@@ -324,8 +320,6 @@ public class JsonViewerPanel extends AbstractPanel {
     private void popup(Exception e) {
 
         LOGGER.warn("Exception occurred", e);
-        // JOptionPane.showMessageDialog(this, e.getMessage(), "Error",
-        // JOptionPane.ERROR_MESSAGE);
 
         StringBuilder filteredMsg = new StringBuilder();
         if (e instanceof JsonProcessingException) {
@@ -334,9 +328,6 @@ public class JsonViewerPanel extends AbstractPanel {
             JsonLocation location = jpe.getLocation();
             String locationStr = String.format(" at line %d col %d", location.getLineNr(), location.getColumnNr());
             filteredMsg.append(locationStr);
-            // textPane.setCaretPosition(textPane.getDocument().getDefaultRootElement()
-            // .getElement(location.getLineNr() - 1).getStartOffset());
-            // textPane.requestFocusInWindow();
         }
         else if (e instanceof JsonSyntaxException) {
 

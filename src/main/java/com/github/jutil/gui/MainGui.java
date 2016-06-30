@@ -102,4 +102,5 @@ public class MainGui {
         mainFrame.repaint();
     }
 }
-// ctrl + L for line number
+// comapre from button
+// line number correction in compare

@@ -10,6 +10,7 @@ import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
+import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
@@ -26,6 +27,8 @@ public class GuiUtils {
         RTextScrollPane scrollPane = new RTextScrollPane(getTextPane(contentType));
         scrollPane.setFoldIndicatorEnabled(true);
         scrollPane.setLineNumbersEnabled(true);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         return scrollPane;
     }
 

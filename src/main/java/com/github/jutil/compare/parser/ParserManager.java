@@ -4,9 +4,10 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 
 import javax.swing.Timer;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
@@ -42,18 +43,34 @@ public class ParserManager {
     private ExtendedTextPane leftTextPane;
     private ExtendedTextPane rightTextPane;
 
+    private boolean isEditing;
+
+    private TextDocumentFilter textDocumentFilter;
+
     public ParserManager(ExtendedTextPane leftTextPane, ExtendedTextPane rightTextPane) {
 
         this.leftTextPane = leftTextPane;
         this.rightTextPane = rightTextPane;
 
-        leftTextPane.getDocument().addDocumentListener(new TextDocumentListener());
-        rightTextPane.getDocument().addDocumentListener(new TextDocumentListener());
-        
+//        ((AbstractDocument) leftTextPane.getDocument())
+//                .setDocumentFilter(textDocumentFilter = new TextDocumentFilter());
+//        ((AbstractDocument) rightTextPane.getDocument()).setDocumentFilter(textDocumentFilter);
+
         diffParser = new DiffParser();
 
         timer = new Timer(GuiConstants.DEFAULT_DELAY_MS, this::startParsing);
         timer.setRepeats(false);
+        timer.start();
+    }
+
+    public void startParsing() {
+
+        startParsing(null);
+    }
+
+    public void stopParsing() {
+
+        timer.stop();
     }
 
     /**
@@ -64,11 +81,27 @@ public class ParserManager {
     private void startParsing(ActionEvent e) {
 
         RSyntaxDocument leftDoc = (RSyntaxDocument) leftTextPane.getDocument();
-        RSyntaxDocument rightDoc = (RSyntaxDocument) leftTextPane.getDocument();
+        RSyntaxDocument rightDoc = (RSyntaxDocument) rightTextPane.getDocument();
 
-        DiffResult diffResult = diffParser.parse(leftDoc, rightDoc);
-
+        DiffResult diffResult;
         try {
+            leftDoc.readLock();
+            rightDoc.readLock();
+
+            // just following convention, ideally this method doesn't throw
+            // exception
+            diffResult = diffParser.parse(leftDoc, rightDoc);
+        } finally {
+            leftDoc.readUnlock();
+            rightDoc.readUnlock();
+        }
+
+        // applying file compare diff, this changes textpane texts, to avoid
+        // multiple parsing retriggers through timer, using flag isEditing
+        try {
+
+            isEditing = true;
+
             leftTextPane.beginAtomicEdit();
             rightTextPane.beginAtomicEdit();
 
@@ -83,6 +116,8 @@ public class ParserManager {
         } finally {
             leftTextPane.endAtomicEdit();
             rightTextPane.endAtomicEdit();
+
+            isEditing = false;
         }
 
     }
@@ -93,6 +128,9 @@ public class ParserManager {
             popup(diffResult.getError());
             return;
         }
+        
+        leftTextPane.removeAllLineHighlights();
+        rightTextPane.removeAllLineHighlights();
 
         int currentRow = 0;
         for (DiffRow row : diffResult.getDiffRows()) {
@@ -103,14 +141,24 @@ public class ParserManager {
 
     private void applyLineHighLight(DiffRow row, int line) throws BadLocationException {
 
-        leftTextPane.append(row.getOldLine());
-        leftTextPane.append(DiffParser.NEW_LINE);
+        if(line == 0) {
+            leftTextPane.append(row.getOldLine());
+            rightTextPane.append(row.getNewLine());
+        }
+        else {
+            leftTextPane.append(StringUtils.join(DiffParser.NEW_LINE, row.getOldLine()));
+            rightTextPane.append(StringUtils.join(DiffParser.NEW_LINE, row.getNewLine()));
+        }
         
-        rightTextPane.append(row.getNewLine());
-        rightTextPane.append(DiffParser.NEW_LINE);
 
         if (row.getTag() != Tag.EQUAL) {
 
+           System.out.println("highlight left " + line + " tag " + row.getTag());
+           
+            
+           
+            
+            System.out.println("highlight right " + line + " tag " + row.getTag());
             leftTextPane.addLineHighlight(line, getLeftColor(row.getTag()));
             rightTextPane.addLineHighlight(line, getRightColor(row.getTag()));
         }
@@ -152,53 +200,39 @@ public class ParserManager {
         }
     }
 
-    private class TextDocumentListener implements DocumentListener {
+    private class TextDocumentFilter extends DocumentFilter {
 
         @Override
-        public void insertUpdate(DocumentEvent e) {
+        public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
+                throws BadLocationException {
 
-            // try {
-            // int offs = e.getOffset();
-            // if (firstLineChanged == null || offs <
-            // firstLineChanged.getOffset()) {
-            // firstLineChanged = e.getDocument().createPosition(offs);
-            // }
-            //
-            // offs = e.getOffset() + e.getLength();
-            // if (lastLineChanged == null || offs >
-            // lastLineChanged.getOffset()) {
-            // lastLineChanged = e.getDocument().createPosition(offs);
-            // }
-            // } catch (BadLocationException e1) {
-            // // should not happen
-            // }
-            timer.restart();
+            super.insertString(fb, offset, string, attr);
+            //System.out.println("insert called");
+            handleDocumentChanged(string == null ? 0 : string.length());
         }
 
         @Override
-        public void removeUpdate(DocumentEvent e) {
+        public void remove(FilterBypass fb, int offset, int length) throws BadLocationException {
 
-            // try {
-            // int offs = e.getOffset();
-            // if (firstLineChanged == null || offs <
-            // firstLineChanged.getOffset()) {
-            // firstLineChanged = e.getDocument().createPosition(offs);
-            // }
-            //
-            // if (lastLineChanged == null || offs >
-            // lastLineChanged.getOffset()) {
-            // lastLineChanged = e.getDocument().createPosition(offs);
-            // }
-            // } catch (BadLocationException e1) {
-            // // should not happen
-            // }
-            timer.restart();
-
+            super.remove(fb, offset, length);
+            System.out.println("remove called");
+            handleDocumentChanged(length);
         }
 
         @Override
-        public void changedUpdate(DocumentEvent e) {
+        public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
+                throws BadLocationException {
 
+            super.replace(fb, offset, length, text, attrs);
+            System.out.println();
+            handleDocumentChanged(text == null ? 0 : text.length());
+        }
+    }
+
+    private void handleDocumentChanged(int length) {
+
+        if (!isEditing && length > 0) {
+            timer.restart();
         }
     }
 

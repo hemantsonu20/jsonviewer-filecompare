@@ -20,37 +20,48 @@ import org.slf4j.LoggerFactory;
 import com.github.jutil.core.gui.ExtendedTextPane;
 import com.github.jutil.core.gui.GuiUtils;
 
-public class CompareTextPanel extends JPanel {
+public class TextPanel extends JPanel {
 
     private static final long serialVersionUID = -2379871518310505299L;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ComparePanel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TextPanel.class);
 
     private File lastDirectory;
     private ExtendedTextPane textPane;
+    private RTextScrollPane scrollPane;
+
+    public RTextScrollPane getScrollPane() {
+
+        return scrollPane;
+    }
+
+    public TextPanel setScrollPane(RTextScrollPane scrollPane) {
+
+        this.scrollPane = scrollPane;
+        return this;
+    }
 
     public ExtendedTextPane getTextPane() {
 
         return textPane;
     }
 
-    public void setTextPane(ExtendedTextPane textPane) {
+    public TextPanel setTextPane(ExtendedTextPane textPane) {
 
         this.textPane = textPane;
+        return this;
     }
 
-    public CompareTextPanel() {
+    public TextPanel() {
 
         init();
-        
-        
     }
 
     public Color getBackgroundColor() {
-        
+
         return textPane.getBackground();
     }
-    
+
     private void init() {
 
         setLayout(new BorderLayout());
@@ -58,8 +69,10 @@ public class CompareTextPanel extends JPanel {
         JPanel settingPanel = new JPanel();
         settingPanel.add(getLoadFileButton());
 
-        RTextScrollPane scrollPane = GuiUtils.getScrollTextPane(SyntaxConstants.SYNTAX_STYLE_NONE);
+        scrollPane = GuiUtils.getScrollTextPane(SyntaxConstants.SYNTAX_STYLE_NONE);
+        
         setTextPane((ExtendedTextPane) scrollPane.getTextArea());
+        textPane.setHighlightCurrentLine(false);
 
         add(settingPanel, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
