@@ -146,8 +146,8 @@ public class ParserManager {
             rightTextPane.append(row.getNewLine());
         }
         else {
-            leftTextPane.append(StringUtils.join(DiffParser.NEW_LINE, row.getOldLine()));
-            rightTextPane.append(StringUtils.join(DiffParser.NEW_LINE, row.getNewLine()));
+            leftTextPane.append(StringUtils.join(DiffParser.NEW_LINE, row.getOldLine(), "    "));
+            rightTextPane.append(StringUtils.join(DiffParser.NEW_LINE, row.getNewLine(), "    "));
         }
         
 

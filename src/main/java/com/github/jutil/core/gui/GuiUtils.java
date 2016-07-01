@@ -13,7 +13,6 @@ import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 
-import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,7 +31,7 @@ public class GuiUtils {
         return scrollPane;
     }
 
-    private static RSyntaxTextArea getTextPane(String contentType) {
+    private static ExtendedTextPane getTextPane(String contentType) {
 
         ExtendedTextPane textPane = new ExtendedTextPane();
         textPane.setSyntaxEditingStyle(contentType);

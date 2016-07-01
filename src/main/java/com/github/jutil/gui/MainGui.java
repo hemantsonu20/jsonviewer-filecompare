@@ -104,3 +104,5 @@ public class MainGui {
 }
 // comapre from button
 // line number correction in compare
+// parse delta vise
+// slider for menus
