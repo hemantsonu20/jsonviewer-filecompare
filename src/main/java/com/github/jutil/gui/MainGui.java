@@ -1,14 +1,12 @@
 package com.github.jutil.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.GridLayout;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.SwingUtilities;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +21,7 @@ public class MainGui {
     private static final Logger LOGGER = LoggerFactory.getLogger(MainGui.class);
 
     private JFrame mainFrame;
-    private JMenu jsonMenu;
+    private JButton jsonMenu;
 
     public static void main(String[] args) {
 
@@ -49,46 +47,36 @@ public class MainGui {
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setResizable(true);
         mainFrame.setLocationByPlatform(true);
-        mainFrame.setLayout(new GridLayout(1, 1));
+        mainFrame.setLayout(new BorderLayout());
 
         JMenuBar menuBar = new JMenuBar();
         menuBar.add(jsonMenu = getJMenu("JSON Viewer", 'J', "A JSON Formatter", JsonViewerPanel.getInstance()));
         menuBar.add(getJMenu("Base64/URL", 'B', "A Base64/Url Encoder/Decoder", Base64UrlPanel.getInstance()));
         menuBar.add(getJMenu("Compare", 'C', "A Text Compare Tool", ComparePanel.getInstance()));
+
         mainFrame.setJMenuBar(menuBar);
+
+        mainFrame.add(ComparePanel.getInstance(), BorderLayout.CENTER);
     }
 
-    private JMenu getJMenu(String title, char mnemonic, String toolTip, AbstractPanel panel) {
+    private JButton getJMenu(String title, char mnemonic, String toolTip, AbstractPanel panel) {
 
-        JMenu jMenu = new JMenu(title);
-        jMenu.setMnemonic(mnemonic);
-        jMenu.setToolTipText(toolTip);
-        jMenu.addMenuListener(new MenuListener() {
+        JButton button = new JButton(title);
+        button.setMnemonic(mnemonic);
+        button.setToolTipText(toolTip);
+        button.addActionListener(e -> {
 
-            @Override
-            public void menuSelected(MenuEvent e) {
+            Container contentPane = mainFrame.getContentPane();
 
-                Container contentPane = mainFrame.getContentPane();
-
-                if (contentPane.getComponents().length <= 0 || contentPane.getComponent(0) != panel) {
-                    resetMainGui();
-                    mainFrame.getContentPane().add(panel);
-                    refreshMainGui();
-                }
-            }
-
-            @Override
-            public void menuDeselected(MenuEvent e) {
-
-            }
-
-            @Override
-            public void menuCanceled(MenuEvent e) {
-
-                System.out.println("menuCanceled");
+            if (contentPane.getComponents().length <= 0 || contentPane.getComponent(0) != panel) {
+                resetMainGui();
+                mainFrame.getContentPane().add(panel);
+                refreshMainGui();
             }
         });
-        return jMenu;
+
+        return button;
+
     }
 
     private void resetMainGui() {
@@ -102,7 +90,3 @@ public class MainGui {
         mainFrame.repaint();
     }
 }
-// comapre from button
-// line number correction in compare
-// parse delta vise
-// slider for menus

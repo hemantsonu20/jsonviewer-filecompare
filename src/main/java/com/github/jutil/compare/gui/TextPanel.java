@@ -70,7 +70,7 @@ public class TextPanel extends JPanel {
         settingPanel.add(getLoadFileButton());
 
         scrollPane = GuiUtils.getScrollTextPane(SyntaxConstants.SYNTAX_STYLE_NONE);
-        
+
         setTextPane((ExtendedTextPane) scrollPane.getTextArea());
         textPane.setHighlightCurrentLine(false);
 
@@ -116,6 +116,7 @@ public class TextPanel extends JPanel {
         } catch (Exception e) {
             popup(e);
         }
+
     }
 
     private void popup(Exception e) {

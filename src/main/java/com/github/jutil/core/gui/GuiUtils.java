@@ -16,6 +16,7 @@ import javax.swing.KeyStroke;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.jutil.compare.parser.DiffParser;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -52,7 +53,8 @@ public class GuiUtils {
 
         StringBuilder builder = new StringBuilder();
         Files.lines(Paths.get(selectedFile.getAbsolutePath())).forEachOrdered(
-                s -> builder.append(s).append(System.lineSeparator()));
+                s -> builder.append(s).append(DiffParser.NEW_LINE));
+        
         return builder.toString();
     }
 
@@ -77,5 +79,9 @@ public class GuiUtils {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.readTree(text);
+    }
+    
+    public static String escapeHtmlEntites(String str) {
+        return str.replace("&lt;", "<").replace("&gt;", ">");
     }
 }

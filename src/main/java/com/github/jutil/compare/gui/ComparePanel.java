@@ -1,22 +1,23 @@
 package com.github.jutil.compare.gui;
 
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.awt.event.KeyEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.JScrollBar;
 
 import com.github.jutil.compare.parser.ParserManager;
 import com.github.jutil.core.gui.AbstractPanel;
+import com.github.jutil.core.gui.GuiUtils;
 
 public class ComparePanel extends AbstractPanel {
 
     private static final long serialVersionUID = 114747990205L;
 
     private static final String BAR_IDENTIFIER = "identifier";
-
-    // private static final Logger LOGGER =
-    // LoggerFactory.getLogger(ComparePanel.class);
 
     private static final ComparePanel INSTANCE = new ComparePanel();
 
@@ -50,12 +51,7 @@ public class ComparePanel extends AbstractPanel {
 
         add(leftPanel = new TextPanel());
         add(rightPanel = new TextPanel());
-
-        // hiding right scroll bar
-        // rightPanel.getScrollPane().setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-
-        // leftPanel.getScrollPane().setModel(rightPanel.getScrollPane().getVerticalScrollBar().getModel());
-
+        
         JScrollBar leftVBar = leftPanel.getScrollPane().getVerticalScrollBar();
         leftVBar.addAdjustmentListener(adjustmentListener);
 
@@ -74,6 +70,17 @@ public class ComparePanel extends AbstractPanel {
 
         leftHBar.putClientProperty(BAR_IDENTIFIER, rightHBar);
         rightHBar.putClientProperty(BAR_IDENTIFIER, leftHBar);
+        
+        GuiUtils.applyShortcut(this, KeyEvent.VK_R, "compare", new AbstractAction() {
+            
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            
+                parserManager.startParsing();
+            }
+        });
     }
 
 
@@ -84,16 +91,4 @@ public class ComparePanel extends AbstractPanel {
         JScrollBar anotherBar = (JScrollBar) bar.getClientProperty(BAR_IDENTIFIER);
         anotherBar.setValue(bar.getValue());
     };
-    
-
-    // private void popup(Exception e) {
-    //
-    // LOGGER.warn("Exception occurred", e);
-    // }
-
-    // private void popup(String msg) {
-    //
-    // JOptionPane.showMessageDialog(this, msg, "Info",
-    // JOptionPane.INFORMATION_MESSAGE);
-    // }
 }
