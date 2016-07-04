@@ -81,6 +81,8 @@ public class ComparePanel extends AbstractPanel {
                 parserManager.startParsing();
             }
         });
+        
+        setToolTipText("Ctrl + R to compare");
     }
 
 
