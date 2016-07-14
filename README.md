@@ -1,7 +1,7 @@
 # daily-util
 A swing application which provides some handy-tools/
 
-Currently this tools have following faetures available.
+Currently this tools have following features available.
 * JSON Viewer
 * Base64 Encoder/Decoder
 * URL Encoder/Decoder
