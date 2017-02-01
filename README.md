@@ -1,4 +1,4 @@
-# daily-util
+# jsonviewer-filecompare 
 A swing application which provides some handy-tools/
 
 Currently this tools have following features available.
